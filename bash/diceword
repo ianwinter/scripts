@@ -1,0 +1,34 @@
+#!/usr/local/bin/bash
+
+if [ "`uname`" = "Darwin" ]
+then
+	SHUFCMD='gshuf'
+else
+	SHUFCMD='shuf'
+fi
+
+function get_num {
+	echo $($SHUFCMD -i 0-9 -n 1 --random-source=/dev/urandom)
+}
+
+function get_phrase {
+	for word in `grep -E '^.{4,8}$' /usr/share/dict/words | $SHUFCMD -n100 --random-source=/dev/urandom | uniq`; do
+	   string="$word"
+	   declare -c string
+	   string=$string
+	   echo $string
+	done \
+	| $SHUFCMD -n3 --random-source=/dev/urandom \
+	| sed -e ':a' -e 'N' -e '$!ba' -e 's/\n//g'
+}
+
+START=1
+END=$1
+END="${END:-1}"
+
+for (( c=$START; c<=$END; c++ ))
+do
+	PHRASE=$(get_phrase)
+	NUM=$(get_num)
+	echo "$PHRASE$NUM"
+done
